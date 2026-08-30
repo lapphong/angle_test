@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+apply(from = "signingConfigs.gradle")
+
 android {
     namespace = "com.example.face_lens"
     compileSdk {
@@ -21,9 +23,14 @@ android {
 
     buildTypes {
         release {
+            isDebuggable = false
             optimization {
                 enable = false
             }
+            signingConfig = signingConfigs.findByName("release")
+        }
+        debug {
+            isDebuggable = true
         }
     }
     compileOptions {
@@ -32,6 +39,10 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    lint {
+        abortOnError = true
+        checkReleaseBuilds = true
     }
 }
 
@@ -58,4 +69,22 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+tasks.register("buildApk") {
+    group = "build"
+    description = "Build the release APK."
+    dependsOn("assembleRelease")
+}
+
+tasks.register("buildAab") {
+    group = "build"
+    description = "Build the release Android App Bundle."
+    dependsOn("bundleRelease")
+}
+
+tasks.register("buildReleaseArtifacts") {
+    group = "build"
+    description = "Build both release APK and AAB artifacts."
+    dependsOn("buildApk", "buildAab")
 }
