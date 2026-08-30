@@ -1,4 +1,4 @@
-package com.example.face_lens.ui.view_model
+package com.example.face_lens.ui.feature.face_detection.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.face_lens.domain.model.DetectedFace
@@ -47,5 +47,4 @@ class FaceDetectionViewModel : ViewModel() {
             }
         }
     }
-
 }

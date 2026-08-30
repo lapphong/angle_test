@@ -10,4 +10,5 @@
     <string name="camera_retry">Thử mở lại</string>
     <string name="camera_front">Camera trước</string>
     <string name="camera_back">Camera sau</string>
+    <string name="language_switch">Chuyển sang tiếng Anh</string>
 </resources>

@@ -1,3 +1,14 @@
+import com.android.build.api.variant.impl.VariantOutputImpl
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Properties
+
+fun getDate(): String {
+    val date = Date()
+    val sdf = SimpleDateFormat("yyyyMMdd")
+    return sdf.format(date)
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -27,7 +38,6 @@ android {
             optimization {
                 enable = false
             }
-            signingConfig = signingConfigs.findByName("release")
         }
         debug {
             isDebuggable = true
@@ -40,9 +50,34 @@ android {
     buildFeatures {
         compose = true
     }
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
     lint {
         abortOnError = true
         checkReleaseBuilds = true
+    }
+
+    //noinspection WrongGradleMethod
+    androidComponents {
+        onVariants { variant ->
+            variant.outputs
+                .forEach { output ->
+                    val variantOutput = output as VariantOutputImpl
+
+                    val applicationId = variant.applicationId.get() // com.exampleFree.app
+                    val versionName = variantOutput.versionName.get() // e.g 1.0.0
+                    val versionCode = variantOutput.versionCode.get() // e.g 1
+                    val flavorName = variant.flavorName ?: "default" // e.g. Free
+                    val buildType = variant.buildType // e.g. debug
+                    val variantName = variant.name // e.g. FreeDebug
+
+                    //customize your app name by using variables
+                    variantOutput.outputFileName = "${flavorName}_v${versionName}_${buildType}_${getDate()}.apk"
+                }
+        }
     }
 }
 
@@ -69,22 +104,4 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
-}
-
-tasks.register("buildApk") {
-    group = "build"
-    description = "Build the release APK."
-    dependsOn("assembleRelease")
-}
-
-tasks.register("buildAab") {
-    group = "build"
-    description = "Build the release Android App Bundle."
-    dependsOn("bundleRelease")
-}
-
-tasks.register("buildReleaseArtifacts") {
-    group = "build"
-    description = "Build both release APK and AAB artifacts."
-    dependsOn("buildApk", "buildAab")
 }

@@ -1,4 +1,4 @@
-package com.example.face_lens.ui.widgets
+package com.example.face_lens.ui.feature.face_detection.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.example.face_lens.domain.model.DetectedFace
 
 @Composable
-fun FaceDetectionOverlay(
+internal fun FaceDetectionOverlay(
     faces: List<DetectedFace>,
     modifier: Modifier = Modifier,
 ) {

@@ -10,4 +10,5 @@
     <string name="camera_retry">Retry camera</string>
     <string name="camera_front">Front camera</string>
     <string name="camera_back">Back camera</string>
+    <string name="language_switch">Switch to Vietnamese</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.face_lens.ui.view_model
+package com.example.face_lens.ui.feature.face_detection.viewmodel
 
 import com.example.face_lens.domain.model.DetectedFace
 import com.example.face_lens.domain.model.FaceBounds

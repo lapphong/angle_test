@@ -1,32 +1,20 @@
-// Keep release credentials outside the repository. Values can be supplied via
-// ~/.gradle/gradle.properties, -P arguments, or environment variables.
-def releaseStoreFile = providers.gradleProperty("RELEASE_STORE_FILE")
-        .orElse(providers.environmentVariable("RELEASE_STORE_FILE"))
-def releaseStorePassword = providers.gradleProperty("RELEASE_STORE_PASSWORD")
-        .orElse(providers.environmentVariable("RELEASE_STORE_PASSWORD"))
-def releaseKeyAlias = providers.gradleProperty("RELEASE_KEY_ALIAS")
-        .orElse(providers.environmentVariable("RELEASE_KEY_ALIAS"))
-def releaseKeyPassword = providers.gradleProperty("RELEASE_KEY_PASSWORD")
-        .orElse(providers.environmentVariable("RELEASE_KEY_PASSWORD"))
-
-def hasReleaseSigning = [
-        releaseStoreFile,
-        releaseStorePassword,
-        releaseKeyAlias,
-        releaseKeyPassword,
-].every { it.isPresent() }
-
 android {
     signingConfigs {
-        if (hasReleaseSigning) {
-            release {
-                storeFile rootProject.file(releaseStoreFile.get())
-                storePassword releaseStorePassword.get()
-                keyAlias releaseKeyAlias.get()
-                keyPassword releaseKeyPassword.get()
-                enableV1Signing true
-                enableV2Signing true
-            }
+        angleai {
+            keyAlias 'angleai'
+            keyPassword 'angleai'
+            storeFile file('angleai.jks')
+            storePassword 'angleai'
+        }
+    }
+
+    flavorDimensions "version"
+
+    productFlavors {
+        angleai {
+            dimension 'version'
+            applicationId "com.angleai.buzzlp"
+            signingConfig signingConfigs.angleai
         }
     }
 }
