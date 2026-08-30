@@ -1,4 +1,4 @@
-package com.example.face_lens.camera
+package com.example.face_lens.ui.face_detection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,73 +7,126 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.face_lens.R
+import com.example.face_lens.domain.model.DetectedFace
+import com.example.face_lens.ui.face_detection.widgets.CameraPreview
+import com.example.face_lens.ui.face_detection.widgets.FaceDetectionOverlay
 
 @Composable
-fun CameraScreen() {
-    var state by remember { mutableStateOf(CameraUiState()) }
-    var cameraSessionKey by remember { mutableIntStateOf(0) }
+fun FaceDetectionScreen(
+    viewModel: FaceDetectionViewModel = viewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    FaceDetectionContent(
+        uiState = uiState,
+        onFacesDetected = viewModel::onFacesDetected,
+        onCameraUnavailable = viewModel::onCameraUnavailable,
+        onSwitchCamera = viewModel::onSwitchCamera,
+        onRetryCamera = viewModel::onRetryCamera,
+    )
+}
+
+@Composable
+private fun FaceDetectionContent(
+    uiState: FaceDetectionUiState,
+    onFacesDetected: (List<DetectedFace>) -> Unit,
+    onCameraUnavailable: () -> Unit,
+    onSwitchCamera: () -> Unit,
+    onRetryCamera: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black),
     ) {
-        key(cameraSessionKey) {
-            if (!state.cameraUnavailable) {
+        key(uiState.cameraLens, uiState.sessionGeneration) {
+            if (!uiState.cameraUnavailable) {
                 CameraPreview(
+                    cameraLens = uiState.cameraLens,
+                    onFacesDetected = onFacesDetected,
+                    onCameraUnavailable = onCameraUnavailable,
                     modifier = Modifier.fillMaxSize(),
-                    onFacesDetected = { faceBoxes ->
-                        state = state.copy(faceBoxes = faceBoxes)
-                    },
-                    onCameraUnavailable = {
-                        state = CameraUiState(cameraUnavailable = true)
-                    },
                 )
             }
         }
 
-        if (state.cameraUnavailable) {
-            CameraUnavailableContent(
-                onRetry = {
-                    state = CameraUiState()
-                    cameraSessionKey++
-                },
-            )
+        if (uiState.cameraUnavailable) {
+            CameraUnavailableContent(onRetry = onRetryCamera)
         } else {
-            FaceOverlay(
-                faceBoxes = state.faceBoxes,
+            FaceDetectionOverlay(
+                faces = uiState.detectedFaces,
                 modifier = Modifier.fillMaxSize(),
             )
             PresenceLabel(
-                presence = state.presence,
+                presence = uiState.presence,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .windowInsetsPadding(WindowInsets.safeDrawing)
-                    .padding(top = 16.dp),
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(top = 76.dp),
+            )
+        }
+
+        CameraSwitchButton(
+            onClick = onSwitchCamera,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .padding(20.dp),
+        )
+
+        ScreenHeader(
+            modifier = Modifier.align(Alignment.TopCenter),
+        )
+    }
+}
+
+@Composable
+private fun ScreenHeader(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color(0xFF2196F3))
+            .windowInsetsPadding(WindowInsets.statusBars),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = stringResource(R.string.screen_title),
+                color = Color.White,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Medium,
             )
         }
     }
@@ -113,6 +166,26 @@ private fun PresenceLabel(
             color = Color.White,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
+        )
+    }
+}
+
+@Composable
+private fun CameraSwitchButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val description = stringResource(R.string.camera_switch)
+    FloatingActionButton(
+        onClick = onClick,
+        modifier = modifier.semantics { contentDescription = description },
+        containerColor = Color(0xFFD7E3FF),
+        contentColor = Color(0xFF001B3F),
+    ) {
+        Text(
+            text = "⇄",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
         )
     }
 }

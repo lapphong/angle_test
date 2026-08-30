@@ -1,4 +1,4 @@
-package com.example.face_lens.camera
+package com.example.face_lens.ui.face_detection.widgets
 
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
@@ -16,12 +16,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.face_lens.domain.model.CameraLens
+import com.example.face_lens.domain.model.DetectedFace
+import com.example.face_lens.domain.model.FaceBounds
+import com.example.face_lens.domain.model.FacePoint
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.google.mlkit.vision.face.FaceLandmark
+
+private val landmarkTypes = listOf(
+    FaceLandmark.LEFT_EYE,
+    FaceLandmark.RIGHT_EYE,
+    FaceLandmark.NOSE_BASE,
+    FaceLandmark.MOUTH_LEFT,
+    FaceLandmark.MOUTH_RIGHT,
+    FaceLandmark.MOUTH_BOTTOM,
+)
 
 @Composable
-internal fun CameraPreview(
-    onFacesDetected: (List<FaceBox>) -> Unit,
+fun CameraPreview(
+    cameraLens: CameraLens,
+    onFacesDetected: (List<DetectedFace>) -> Unit,
     onCameraUnavailable: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -34,14 +49,20 @@ internal fun CameraPreview(
         FaceDetection.getClient(
             FaceDetectorOptions.Builder()
                 .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+                .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
                 .setMinFaceSize(0.10f)
                 .enableTracking()
                 .build(),
         )
     }
-    val cameraController = remember(context) {
+    val cameraController = remember(context, cameraLens) {
         LifecycleCameraController(context).apply {
-            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+            cameraSelector = if (cameraLens == CameraLens.FRONT) {
+                CameraSelector.DEFAULT_FRONT_CAMERA
+            } else {
+                CameraSelector.DEFAULT_BACK_CAMERA
+            }
             setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
         }
     }
@@ -67,17 +88,26 @@ internal fun CameraPreview(
             ImageAnalysis.COORDINATE_SYSTEM_VIEW_REFERENCED,
             mainExecutor,
         ) { result ->
-            val faceBoxes = result.getValue(faceDetector)
+            val detectedFaces = result.getValue(faceDetector)
                 ?.map { face ->
-                    FaceBox(
-                        left = face.boundingBox.left.toFloat(),
-                        top = face.boundingBox.top.toFloat(),
-                        right = face.boundingBox.right.toFloat(),
-                        bottom = face.boundingBox.bottom.toFloat(),
+                    DetectedFace(
+                        bounds = FaceBounds(
+                            left = face.boundingBox.left.toFloat(),
+                            top = face.boundingBox.top.toFloat(),
+                            right = face.boundingBox.right.toFloat(),
+                            bottom = face.boundingBox.bottom.toFloat(),
+                        ),
+                        landmarks = landmarkTypes.mapNotNull { landmarkType ->
+                            face.getLandmark(landmarkType)?.position?.let { point ->
+                                FacePoint(x = point.x, y = point.y)
+                            }
+                        },
+                        smilingProbability = face.smilingProbability,
+                        trackingId = face.trackingId,
                     )
                 }
                 .orEmpty()
-            currentOnFacesDetected.value(faceBoxes)
+            currentOnFacesDetected.value(detectedFaces)
         }
 
         try {
