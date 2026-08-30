@@ -6,8 +6,6 @@
     <string name="camera_permission_message">Face Lens cần dùng camera trước để phát hiện khuôn mặt theo thời gian thực.</string>
     <string name="camera_permission_retry">Thử lại</string>
     <string name="camera_permission_settings">Mở cài đặt</string>
-    <string name="camera_unavailable">Không thể mở camera trên thiết bị này.</string>
+    <string name="camera_unavailable">Không thể mở camera trước trên thiết bị này.</string>
     <string name="camera_retry">Thử mở lại</string>
-    <string name="screen_title">ML Kit</string>
-    <string name="camera_switch">Đổi camera trước hoặc sau</string>
 </resources>

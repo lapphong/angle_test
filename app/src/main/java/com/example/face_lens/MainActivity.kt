@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.face_lens.core.permission.CameraPermissionGate
-import com.example.face_lens.ui.face_detection.FaceDetectionScreen
+import com.example.face_lens.ui.FaceDetectionScreen
 import com.example.face_lens.ui.theme.FaceLensTheme
 
 class MainActivity : ComponentActivity() {

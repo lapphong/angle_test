@@ -1,4 +1,4 @@
-package com.example.face_lens.ui.face_detection.widgets
+package com.example.face_lens.ui.widgets
 
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
@@ -16,26 +16,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.example.face_lens.domain.model.CameraLens
 import com.example.face_lens.domain.model.DetectedFace
 import com.example.face_lens.domain.model.FaceBounds
-import com.example.face_lens.domain.model.FacePoint
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.google.mlkit.vision.face.FaceLandmark
-
-private val landmarkTypes = listOf(
-    FaceLandmark.LEFT_EYE,
-    FaceLandmark.RIGHT_EYE,
-    FaceLandmark.NOSE_BASE,
-    FaceLandmark.MOUTH_LEFT,
-    FaceLandmark.MOUTH_RIGHT,
-    FaceLandmark.MOUTH_BOTTOM,
-)
 
 @Composable
 fun CameraPreview(
-    cameraLens: CameraLens,
     onFacesDetected: (List<DetectedFace>) -> Unit,
     onCameraUnavailable: () -> Unit,
     modifier: Modifier = Modifier,
@@ -49,20 +36,14 @@ fun CameraPreview(
         FaceDetection.getClient(
             FaceDetectorOptions.Builder()
                 .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
-                .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
-                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
                 .setMinFaceSize(0.10f)
                 .enableTracking()
                 .build(),
         )
     }
-    val cameraController = remember(context, cameraLens) {
+    val cameraController = remember(context) {
         LifecycleCameraController(context).apply {
-            cameraSelector = if (cameraLens == CameraLens.FRONT) {
-                CameraSelector.DEFAULT_FRONT_CAMERA
-            } else {
-                CameraSelector.DEFAULT_BACK_CAMERA
-            }
+            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
             setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
         }
     }
@@ -97,13 +78,6 @@ fun CameraPreview(
                             right = face.boundingBox.right.toFloat(),
                             bottom = face.boundingBox.bottom.toFloat(),
                         ),
-                        landmarks = landmarkTypes.mapNotNull { landmarkType ->
-                            face.getLandmark(landmarkType)?.position?.let { point ->
-                                FacePoint(x = point.x, y = point.y)
-                            }
-                        },
-                        smilingProbability = face.smilingProbability,
-                        trackingId = face.trackingId,
                     )
                 }
                 .orEmpty()

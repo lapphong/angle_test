@@ -1,11 +1,9 @@
-package com.example.face_lens.ui.face_detection
+package com.example.face_lens.ui.view_model
 
-import com.example.face_lens.domain.model.CameraLens
 import com.example.face_lens.domain.model.DetectedFace
 
 data class FaceDetectionUiState(
     val detectedFaces: List<DetectedFace> = emptyList(),
-    val cameraLens: CameraLens = CameraLens.FRONT,
     val cameraUnavailable: Boolean = false,
     val sessionGeneration: Int = 0,
 ) {

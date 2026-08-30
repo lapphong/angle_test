@@ -1,7 +1,6 @@
-package com.example.face_lens.ui.face_detection
+package com.example.face_lens.ui.view_model
 
 import androidx.lifecycle.ViewModel
-import com.example.face_lens.domain.model.CameraLens
 import com.example.face_lens.domain.model.DetectedFace
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,21 +13,6 @@ class FaceDetectionViewModel : ViewModel() {
 
     fun onFacesDetected(faces: List<DetectedFace>) {
         _uiState.update { state -> state.copy(detectedFaces = faces) }
-    }
-
-    fun onSwitchCamera() {
-        _uiState.update { state ->
-            state.copy(
-                detectedFaces = emptyList(),
-                cameraLens = if (state.cameraLens == CameraLens.FRONT) {
-                    CameraLens.BACK
-                } else {
-                    CameraLens.FRONT
-                },
-                cameraUnavailable = false,
-                sessionGeneration = state.sessionGeneration + 1,
-            )
-        }
     }
 
     fun onCameraUnavailable() {

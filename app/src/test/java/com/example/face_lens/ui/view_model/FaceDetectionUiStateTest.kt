@@ -1,6 +1,5 @@
-package com.example.face_lens.ui.face_detection
+package com.example.face_lens.ui.view_model
 
-import com.example.face_lens.domain.model.CameraLens
 import com.example.face_lens.domain.model.DetectedFace
 import com.example.face_lens.domain.model.FaceBounds
 import org.junit.Assert.assertEquals
@@ -23,15 +22,5 @@ class FaceDetectionUiStateTest {
         )
 
         assertEquals(Presence.PERSON_PRESENT, state.presence)
-    }
-
-    @Test
-    fun `switch camera toggles lens and starts a new session`() {
-        val viewModel = FaceDetectionViewModel()
-
-        viewModel.onSwitchCamera()
-
-        assertEquals(CameraLens.BACK, viewModel.uiState.value.cameraLens)
-        assertEquals(1, viewModel.uiState.value.sessionGeneration)
     }
 }

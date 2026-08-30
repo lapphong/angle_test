@@ -10,14 +10,6 @@ data class FaceBounds(
     val height: Float get() = bottom - top
 }
 
-data class FacePoint(
-    val x: Float,
-    val y: Float,
-)
-
 data class DetectedFace(
     val bounds: FaceBounds,
-    val landmarks: List<FacePoint> = emptyList(),
-    val smilingProbability: Float? = null,
-    val trackingId: Int? = null,
 )
