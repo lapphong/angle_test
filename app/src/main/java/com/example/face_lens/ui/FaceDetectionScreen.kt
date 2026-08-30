@@ -29,6 +29,7 @@ import com.example.face_lens.R
 import com.example.face_lens.domain.model.DetectedFace
 import com.example.face_lens.ui.view_model.FaceDetectionUiState
 import com.example.face_lens.ui.view_model.FaceDetectionViewModel
+import com.example.face_lens.ui.view_model.LensFacing
 import com.example.face_lens.ui.view_model.Presence
 import com.example.face_lens.ui.widgets.CameraPreview
 import com.example.face_lens.ui.widgets.FaceDetectionOverlay
@@ -44,6 +45,7 @@ fun FaceDetectionScreen(
         onFacesDetected = viewModel::onFacesDetected,
         onCameraUnavailable = viewModel::onCameraUnavailable,
         onRetryCamera = viewModel::onRetryCamera,
+        onToggleLens = viewModel::onToggleLens,
     )
 }
 
@@ -53,15 +55,17 @@ private fun FaceDetectionContent(
     onFacesDetected: (List<DetectedFace>) -> Unit,
     onCameraUnavailable: () -> Unit,
     onRetryCamera: () -> Unit,
+    onToggleLens: () -> Unit,
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black),
     ) {
-        key(uiState.sessionGeneration) {
+        key(uiState.sessionGeneration, uiState.lensFacing) {
             if (!uiState.cameraUnavailable) {
                 CameraPreview(
+                    lensFacing = uiState.lensFacing,
                     onFacesDetected = onFacesDetected,
                     onCameraUnavailable = onCameraUnavailable,
                     modifier = Modifier.fillMaxSize(),
@@ -83,7 +87,34 @@ private fun FaceDetectionContent(
                     .windowInsetsPadding(WindowInsets.safeDrawing)
                     .padding(top = 16.dp),
             )
+            CameraSwitchButton(
+                lensFacing = uiState.lensFacing,
+                onClick = onToggleLens,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
+                    .padding(bottom = 24.dp),
+            )
         }
+    }
+}
+
+@Composable
+private fun CameraSwitchButton(
+    lensFacing: LensFacing,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val targetCameraLabel = stringResource(
+        if (lensFacing == LensFacing.FRONT) R.string.camera_back else R.string.camera_front,
+    )
+
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(50),
+    ) {
+        Text(text = "↻  $targetCameraLabel")
     }
 }
 

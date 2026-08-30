@@ -30,4 +30,22 @@ class FaceDetectionViewModel : ViewModel() {
             )
         }
     }
+
+    fun onToggleLens() {
+        _uiState.update { state ->
+            if (state.cameraUnavailable) {
+                state
+            } else {
+                state.copy(
+                    detectedFaces = emptyList(),
+                    lensFacing = if (state.lensFacing == LensFacing.FRONT) {
+                        LensFacing.BACK
+                    } else {
+                        LensFacing.FRONT
+                    },
+                )
+            }
+        }
+    }
+
 }

@@ -17,3 +17,10 @@ captures/
 
 # OS files
 .DS_Store
+
+# APK / AAB
+app/angleai/
+
+# Signing keys (keep credentials local)
+*.jks
+*.keystore

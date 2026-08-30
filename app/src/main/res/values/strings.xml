@@ -3,9 +3,11 @@
     <string name="status_person_present">Có người</string>
     <string name="status_no_person">Không có người</string>
     <string name="camera_permission_title">Cần quyền truy cập camera</string>
-    <string name="camera_permission_message">Face Lens cần dùng camera trước để phát hiện khuôn mặt theo thời gian thực.</string>
+    <string name="camera_permission_message">Face Lens cần dùng camera để phát hiện khuôn mặt theo thời gian thực.</string>
     <string name="camera_permission_retry">Thử lại</string>
     <string name="camera_permission_settings">Mở cài đặt</string>
-    <string name="camera_unavailable">Không thể mở camera trước trên thiết bị này.</string>
+    <string name="camera_unavailable">Không thể mở camera trên thiết bị này.</string>
     <string name="camera_retry">Thử mở lại</string>
+    <string name="camera_front">Camera trước</string>
+    <string name="camera_back">Camera sau</string>
 </resources>

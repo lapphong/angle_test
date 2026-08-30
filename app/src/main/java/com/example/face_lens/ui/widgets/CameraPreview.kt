@@ -18,11 +18,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.face_lens.domain.model.DetectedFace
 import com.example.face_lens.domain.model.FaceBounds
+import com.example.face_lens.ui.view_model.LensFacing
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 
 @Composable
 fun CameraPreview(
+    lensFacing: LensFacing,
     onFacesDetected: (List<DetectedFace>) -> Unit,
     onCameraUnavailable: () -> Unit,
     modifier: Modifier = Modifier,
@@ -41,9 +43,12 @@ fun CameraPreview(
                 .build(),
         )
     }
-    val cameraController = remember(context) {
+    val cameraController = remember(context, lensFacing) {
         LifecycleCameraController(context).apply {
-            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+            cameraSelector = when (lensFacing) {
+                LensFacing.FRONT -> CameraSelector.DEFAULT_FRONT_CAMERA
+                LensFacing.BACK -> CameraSelector.DEFAULT_BACK_CAMERA
+            }
             setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
         }
     }

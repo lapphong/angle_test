@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Face Lens</string>
+    <string name="status_person_present">Person detected</string>
+    <string name="status_no_person">No person</string>
+    <string name="camera_permission_title">Camera access required</string>
+    <string name="camera_permission_message">Face Lens uses the camera to detect faces in real time.</string>
+    <string name="camera_permission_retry">Try again</string>
+    <string name="camera_permission_settings">Open settings</string>
+    <string name="camera_unavailable">The camera is unavailable on this device.</string>
+    <string name="camera_retry">Retry camera</string>
+    <string name="camera_front">Front camera</string>
+    <string name="camera_back">Back camera</string>
+</resources>
